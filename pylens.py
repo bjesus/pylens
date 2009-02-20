@@ -84,18 +84,13 @@ def do_press(actor, event):
     #    actor.set_depth(actor.get_depth()-30)
     actor.do_paint(actor)
     
-def do_event(actor, event):
-    print event
-    print actor
-    #if event.button == 1:
-    #    actor.set_depth(actor.get_depth()-30)
-    #actor.do_paint(actor)
+def do_focus(actor, event):
+    actor.set_opacity(255)
+
+def do_unfocus(actor, event):
+    actor.set_opacity(200)
 
 def do_key(actor, event):
-    #print actor
-    #print event
-    #print event.keyval
-    #print event.unicode_value
     if event.keyval == 65363: # right
         actor.get_children()[0].move_by(-200, 0)
     elif event.keyval == 65361: # left
@@ -120,7 +115,7 @@ def do_scroll(actor, event):
     actor.do_paint(actor)
     
     
-def main (args):
+def main(args):
     try:
         os.mkdir(cache_dir)
     except:
@@ -138,7 +133,7 @@ def main (args):
     xpos = 20
     ypos = 40
     wall = clutter.Group()
-    wall.connect('motion-event', do_event)
+
     for f in files:
         if f.lower().endswith("jpg"):
             img = args[0]+"/"+f
@@ -148,14 +143,17 @@ def main (args):
             group = clutter.Group()
             wall.add(group)
             tex = clutter.Texture(cache_dir+f)
+            tex.set_opacity(200)
             reflect = TextureReflection(tex)
-            reflect.set_opacity(50)
+            reflect.set_opacity(80)
             xoffset = (thumb[0]-tex.get_size()[0])/2
             yoffset = (thumb[1]-tex.get_size()[1])/2
             group.add(tex, reflect)
             group.set_positionu(xpos+xoffset, ypos+yoffset)
             reflect.set_positionu(0.0, (tex.get_heightu()+5))
-            tex.connect('motion-event', do_event)            
+            tex.set_reactive(True)
+            tex.connect('enter-event', do_focus)
+            tex.connect('leave-event', do_unfocus)
             xpos = xpos+thumb[0]+20
             if xpos > stage_width:
                 xpos = 20
