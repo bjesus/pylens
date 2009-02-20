@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylens is a free PicLens clone for Linux!# 
+# pylens is a free PicLens clone for Linux!
 # it's based on Clutter, so it should work on Windows and OS X too
 # It's nowhere near finished yet
 
@@ -77,11 +77,8 @@ class TextureReflection (clutter.CloneTexture):
         cogl.pop_matrix()
 
 def do_press(actor, event):
-    if event.button == 1:
-        actor.set_depth(actor.get_depth()+30)
-    elif event.button == 3:
-        actor.set_depth(actor.get_depth()-30)
-    #print event.button
+    #if event.button == 1:
+    #    actor.set_depth(actor.get_depth()-30)
     actor.do_paint(actor)
 
 def do_key(actor, event):
@@ -101,6 +98,18 @@ def do_key(actor, event):
         clutter.main_quit()
     actor.do_paint(actor)
     
+def do_scroll(actor, event):
+    if event.direction == clutter.SCROLL_DOWN:
+        actor.set_depth(actor.get_depth()-20)
+    elif event.direction == clutter.SCROLL_UP:
+        actor.set_depth(actor.get_depth()+20)
+    elif event.direction == clutter.SCROLL_RIGHT:
+        actor.get_children()[0].move_by(-70, 0)
+    elif event.direction == clutter.SCROLL_LEFT:
+        actor.get_children()[0].move_by(70, 0)
+    actor.do_paint(actor)
+    
+    
 def main (args):
     try:
         os.mkdir("/home/bjesus/.pylens")
@@ -110,7 +119,7 @@ def main (args):
     stage.set_color(clutter.Color(0, 0, 0, 255))
     stage.connect('button-press-event', do_press)
     stage.connect('key-press-event', do_key)
-    stage.connect('key-press-event', do_key)
+    stage.connect('scroll-event', do_scroll)
     stage.connect('destroy', clutter.main_quit)
     stage.fullscreen()
     stage_width, stage_height = stage.get_size()
