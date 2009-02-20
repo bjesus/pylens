@@ -129,7 +129,7 @@ def main (args):
     
     files = os.listdir(args[0])
     xpos = 20
-    ypos = 20
+    ypos = 40
     wall = clutter.Group()
     for f in files:
         if f.lower().endswith("jpg"):
@@ -153,7 +153,6 @@ def main (args):
                 xpos = 20
                 ypos = ypos+thumb[1]+100
     stage.add(wall)
-    wall.move_by(300, 0)
     
     #timeline = clutter.Timeline(duration=3000)
     #timeline.set_loop(True)
