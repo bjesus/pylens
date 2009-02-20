@@ -84,7 +84,7 @@ def do_press(actor, event):
     #    actor.set_depth(actor.get_depth()-30)
     actor.do_paint(actor)
     
-def do_press(actor, event):
+def do_event(actor, event):
     print event
     print actor
     #if event.button == 1:
@@ -126,19 +126,19 @@ def main (args):
     except:
         pass
     stage = clutter.Stage()
+    stage.fullscreen()
     stage.set_color(clutter.Color(0, 0, 0, 255))
     stage.connect('button-press-event', do_press)
     stage.connect('key-press-event', do_key)
     stage.connect('scroll-event', do_scroll)
     stage.connect('destroy', clutter.main_quit)
-    stage.connect('motion-event', do_event)
-    stage.fullscreen()
     stage_width, stage_height = stage.get_size()
     
     files = os.listdir(args[0])
     xpos = 20
     ypos = 40
     wall = clutter.Group()
+    wall.connect('motion-event', do_event)
     for f in files:
         if f.lower().endswith("jpg"):
             img = args[0]+"/"+f
@@ -150,31 +150,19 @@ def main (args):
             tex = clutter.Texture(cache_dir+f)
             reflect = TextureReflection(tex)
             reflect.set_opacity(50)
-            offset = (thumb[0]-tex.get_size()[0])/2
-
+            xoffset = (thumb[0]-tex.get_size()[0])/2
+            yoffset = (thumb[1]-tex.get_size()[1])/2
             group.add(tex, reflect)
-            group.set_positionu(xpos+offset, ypos)
+            group.set_positionu(xpos+xoffset, ypos+yoffset)
             reflect.set_positionu(0.0, (tex.get_heightu()+5))
-            
+            tex.connect('motion-event', do_event)            
             xpos = xpos+thumb[0]+20
             if xpos > stage_width:
                 xpos = 20
                 ypos = ypos+thumb[1]+100
     stage.add(wall)
-    
-    #timeline = clutter.Timeline(duration=3000)
-    #timeline.set_loop(True)
-    #alpha = clutter.Alpha(timeline, clutter.ramp_inc_func)
 
-    #behaviour = clutter.BehaviourRotate(clutter.Y_AXIS, 0.0, 360.0, alpha, clutter.ROTATE_CW)
-    #behaviour.set_center(group.get_width()/2, 0, 0)
-    #behaviour.apply(stage)
-    
     stage.show()
-    stage.set_depth(0)
-    #timeline.start()
-    
-
     clutter.main()
 
     return 0
