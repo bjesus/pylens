@@ -86,6 +86,13 @@ def do_press(actor, event):
     
 def do_focus(actor, event):
     actor.set_opacity(255)
+    
+def do_show(actor, event):
+    print f
+    #pic = clutter.Texture(args[0]+"/"+f)
+    
+    
+    
 
 def do_unfocus(actor, event):
     actor.set_opacity(200)
@@ -154,6 +161,7 @@ def main(args):
             tex.set_reactive(True)
             tex.connect('enter-event', do_focus)
             tex.connect('leave-event', do_unfocus)
+            tex.connect('button-press-event', do_show(f))
             xpos = xpos+thumb[0]+20
             if xpos > stage_width:
                 xpos = 20
