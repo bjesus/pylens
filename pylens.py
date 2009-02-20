@@ -7,6 +7,9 @@ import sys, os, gobject, clutter
 from PIL import Image
 from clutter import cogl
 
+cache_dir = os.path.expanduser("~")+"/.pylens/"
+thumb = [200, 150]
+
 class TextureReflection (clutter.CloneTexture):
     """
     TextureReflection (clutter.CloneTexture)
@@ -112,7 +115,7 @@ def do_scroll(actor, event):
     
 def main (args):
     try:
-        os.mkdir("/home/bjesus/.pylens")
+        os.mkdir(cache_dir)
     except:
         pass
     stage = clutter.Stage()
@@ -131,26 +134,24 @@ def main (args):
     for f in files:
         if f.lower().endswith("jpg"):
             img = args[0]+"/"+f
-            #print "Thumnailing", img, "..."
             im = Image.open(img)
-            im.thumbnail( (200,150), Image.ANTIALIAS)
-            im.save("/home/bjesus/.pylens/"+f)
-            #print "Drawing", img, " on ", str(xpos), str(ypos), "..."
+            im.thumbnail( (thumb[0],thumb[1]), Image.ANTIALIAS)
+            im.save(cache_dir+f)
             group = clutter.Group()
             wall.add(group)
-            tex = clutter.Texture("/home/bjesus/.pylens/"+f)
+            tex = clutter.Texture(cache_dir+f)
             reflect = TextureReflection(tex)
             reflect.set_opacity(50)
-            offset = (200-tex.get_size()[0])/2
+            offset = (thumb[0]-tex.get_size()[0])/2
 
             group.add(tex, reflect)
             group.set_positionu(xpos+offset, ypos)
             reflect.set_positionu(0.0, (tex.get_heightu()+5))
             
-            xpos = xpos+220
+            xpos = xpos+thumb[0]+20
             if xpos > stage_width:
                 xpos = 20
-                ypos = ypos+250
+                ypos = ypos+thumb[1]+100
     stage.add(wall)
     wall.move_by(300, 0)
     
