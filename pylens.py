@@ -83,6 +83,13 @@ def do_press(actor, event):
     #if event.button == 1:
     #    actor.set_depth(actor.get_depth()-30)
     actor.do_paint(actor)
+    
+def do_press(actor, event):
+    print event
+    print actor
+    #if event.button == 1:
+    #    actor.set_depth(actor.get_depth()-30)
+    #actor.do_paint(actor)
 
 def do_key(actor, event):
     #print actor
@@ -124,6 +131,7 @@ def main (args):
     stage.connect('key-press-event', do_key)
     stage.connect('scroll-event', do_scroll)
     stage.connect('destroy', clutter.main_quit)
+    stage.connect('motion-event', do_event)
     stage.fullscreen()
     stage_width, stage_height = stage.get_size()
     
