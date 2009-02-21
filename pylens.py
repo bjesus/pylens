@@ -78,21 +78,32 @@ class TextureReflection (clutter.CloneTexture):
         cogl_tex.texture_polygon(vertices=vertices, use_color=True)
 
         cogl.pop_matrix()
-
-def do_press(actor, event):
-    #if event.button == 1:
-    #    actor.set_depth(actor.get_depth()-30)
-    actor.do_paint(actor)
     
 def do_focus(actor, event):
     actor.set_opacity(255)
     
-def do_show(actor, event):
-    print f
-    #pic = clutter.Texture(args[0]+"/"+f)
-    
-    
-    
+def do_show(actor, event, img):
+    stage = actor.get_stage()
+    stage_width, stage_height = stage.get_size()
+    pic = clutter.Texture(img)
+    pic_width, pic_height = pic.get_size()
+    if pic_width > stage_width:
+        pic.set_size(stage_width, pic_height)
+    pic_width, pic_height = pic.get_size()
+    if pic_height > stage_height:
+        pic.set_size(pic_width, stage_height)
+    pic_width, pic_height = pic.get_size()
+    pic.set_reactive(True)
+    pic.connect('leave-event', do_remove)
+    pic.connect('button-press-event', do_remove)
+    g = clutter.Group()
+    g.add(pic)
+    g.set_position((stage_width-pic_width)/2, (stage_height-pic_height)/2)
+    stage.add(g)
+
+def do_remove(actor, event):
+    g = actor.get_parent()
+    g.get_parent().remove(g)
 
 def do_unfocus(actor, event):
     actor.set_opacity(200)
@@ -120,8 +131,7 @@ def do_scroll(actor, event):
     elif event.direction == clutter.SCROLL_LEFT:
         actor.get_children()[0].move_by(70, 0)
     actor.do_paint(actor)
-    
-    
+
 def main(args):
     try:
         os.mkdir(cache_dir)
@@ -130,7 +140,6 @@ def main(args):
     stage = clutter.Stage()
     stage.fullscreen()
     stage.set_color(clutter.Color(0, 0, 0, 255))
-    stage.connect('button-press-event', do_press)
     stage.connect('key-press-event', do_key)
     stage.connect('scroll-event', do_scroll)
     stage.connect('destroy', clutter.main_quit)
@@ -161,7 +170,7 @@ def main(args):
             tex.set_reactive(True)
             tex.connect('enter-event', do_focus)
             tex.connect('leave-event', do_unfocus)
-            tex.connect('button-press-event', do_show(f))
+            tex.connect('button-press-event', do_show, img)
             xpos = xpos+thumb[0]+20
             if xpos > stage_width:
                 xpos = 20
