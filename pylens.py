@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-# pylens is a free PicLens clone for Linux!
-# it's based on Clutter, so it should work on Windows and OS X too
-# It's nowhere near finished yet
+# PyLens is a free PicLens clone for Linux!
+# It's uses Clutter, so it should work on Windows and OS X too.
+# It's nowhere near finished yet.
+#
+# Run it like './pylens.py /full/path/to/your/images/folder'.
+# Code was tested with Clutter 0.8.4 & pyclutter 0.8.2
 
 import sys, os, gobject, clutter
 from PIL import Image
