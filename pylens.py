@@ -72,8 +72,8 @@ class TextureReflection (clutter.CloneTexture):
         vertices = ( \
             (    0,        0, 0, 0.0, rty,   (255, 255, 255, opacity)), \
             (width,        0, 0, 1.0, rty,   (255, 255, 255, opacity)), \
-            (width, r_height, 0, 1.0,   0.0, (255, 255, 255,       0)), \
-            (    0, r_height, 0, 0.0,   0.0, (255, 255, 255,       0)), \
+            (width, r_height/2, 0, 1.0,   0.0, (255, 255, 255,       0)), \
+            (    0, r_height/2, 0, 0.0,   0.0, (255, 255, 255,       0)), \
         )
 
         cogl.push_matrix()
@@ -82,8 +82,8 @@ class TextureReflection (clutter.CloneTexture):
 
         cogl.pop_matrix()
     
-def do_focus(actor, event):
-    actor.set_opacity(255)
+def do_focus(actor, event, group):
+    group.set_opacity(255)
     
 def do_show(actor, event, img):
     stage = actor.get_stage()
@@ -108,8 +108,8 @@ def do_remove(actor, event):
     g = actor.get_parent()
     g.get_parent().remove(g)
 
-def do_unfocus(actor, event):
-    actor.set_opacity(200)
+def do_unfocus(actor, event, group):
+    group.set_opacity(200)
 
 def do_key(actor, event):
     if event.keyval == 65363: # right
@@ -141,6 +141,8 @@ def main(args):
     except:
         pass
     stage = clutter.Stage()
+    stage.set_perspective(60.0, 1.0, 0.1, 100.0)
+    #print stage.get_perspective()
     stage.fullscreen()
     stage.set_color(clutter.Color(0, 0, 0, 255))
     stage.connect('key-press-event', do_key)
@@ -151,10 +153,11 @@ def main(args):
     files = os.listdir(args[0])
     xpos = 20
     ypos = 40
+    count = 1
     wall = clutter.Group()
 
     for f in files:
-        if f.lower().endswith("jpg"):
+        try:
             img = args[0]+"/"+f
             im = Image.open(img)
             im.thumbnail( (thumb[0],thumb[1]), Image.ANTIALIAS)
@@ -162,22 +165,27 @@ def main(args):
             group = clutter.Group()
             wall.add(group)
             tex = clutter.Texture(cache_dir+f)
-            tex.set_opacity(200)
             reflect = TextureReflection(tex)
-            reflect.set_opacity(80)
+            reflect.set_opacity(120)
             xoffset = (thumb[0]-tex.get_size()[0])/2
             yoffset = (thumb[1]-tex.get_size()[1])/2
             group.add(tex, reflect)
             group.set_positionu(xpos+xoffset, ypos+yoffset)
             reflect.set_positionu(0.0, (tex.get_heightu()+5))
+            group.set_reactive(True)
             tex.set_reactive(True)
-            tex.connect('enter-event', do_focus)
-            tex.connect('leave-event', do_unfocus)
+            group.set_opacity(200)
+            tex.connect('enter-event', do_focus, group)
+            tex.connect('leave-event', do_unfocus, group)
             tex.connect('button-press-event', do_show, img)
-            xpos = xpos+thumb[0]+20
-            if xpos > stage_width:
-                xpos = 20
-                ypos = ypos+thumb[1]+100
+            ypos = ypos+thumb[1]+80
+            if count > 2:
+                xpos = xpos+thumb[0]+60
+                ypos = 40
+                count = 0
+            count = count+1
+        except:
+            pass
     stage.add(wall)
 
     stage.show()
